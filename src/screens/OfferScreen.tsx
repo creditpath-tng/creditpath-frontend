@@ -1,5 +1,6 @@
 import { useEffect, useState, useRef } from "react";
 import HeaderBar from "@/components/HeaderBar";
+import BottomNav from "@/components/BottomNav";
 import { useNavigation } from "@/hooks/useNavigation";
 import { useToast } from "@/hooks/use-toast";
 
@@ -39,7 +40,7 @@ const OfferScreen = () => {
   }, []);
 
   return (
-    <div className="min-h-screen bg-cp-bg relative">
+    <div className="min-h-screen bg-cp-bg relative pb-20">
       <HeaderBar />
 
       {/* Milestone Toast */}
@@ -106,6 +107,7 @@ const OfferScreen = () => {
       >
         ← Back to my score
       </p>
+      <BottomNav />
     </div>
   );
 };

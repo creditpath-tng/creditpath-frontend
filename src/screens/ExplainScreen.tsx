@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { ChevronDown } from "lucide-react";
+import BottomNav from "@/components/BottomNav";
 import { useNavigation } from "@/hooks/useNavigation";
 
 const MOCK = {
@@ -30,7 +31,7 @@ const ExplainScreen = () => {
   const [questsOpen, setQuestsOpen] = useState(false);
 
   return (
-    <div className="min-h-screen bg-cp-bg">
+    <div className="min-h-screen bg-cp-bg pb-20">
       {/* Header with back */}
       <div className="flex items-center justify-between px-5 h-14 bg-primary">
         <div className="flex items-center gap-3">
@@ -106,6 +107,7 @@ const ExplainScreen = () => {
       >
         View audit record →
       </p>
+      <BottomNav />
     </div>
   );
 };

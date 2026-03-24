@@ -117,6 +117,13 @@ const WelcomeScreen = () => {
           Analyse My History
         </button>
       </div>
+
+      <p
+        className="text-center text-[11px] text-cp-text-light cursor-pointer mb-4"
+        onClick={() => navigateTo("admin")}
+      >
+        Admin
+      </p>
     </div>
   );
 };

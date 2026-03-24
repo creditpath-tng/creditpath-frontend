@@ -1,5 +1,6 @@
 import { useEffect, useState, useRef } from "react";
 import HeaderBar from "@/components/HeaderBar";
+import BottomNav from "@/components/BottomNav";
 import { useNavigation } from "@/hooks/useNavigation";
 
 const MOCK_SCORE_DATA = {
@@ -106,7 +107,7 @@ const ScoreScreen = () => {
   let globalBarIndex = 0;
 
   return (
-    <div className="min-h-screen bg-cp-bg">
+    <div className="min-h-screen bg-cp-bg pb-20">
       <HeaderBar />
 
       <div className="px-4 pt-1 pb-2">
@@ -225,6 +226,7 @@ const ScoreScreen = () => {
           📊 My Progress
         </p>
       </div>
+      <BottomNav />
     </div>
   );
 };

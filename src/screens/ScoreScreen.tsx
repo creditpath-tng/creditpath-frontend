@@ -125,7 +125,7 @@ const ScoreScreen = () => {
         </div>
 
         <div className="flex items-center justify-center gap-1.5 mt-3 flex-wrap">
-          {[`📊 ${data?.recency_trend ? data.recency_trend.charAt(0).toUpperCase() + data.recency_trend.slice(1) : "Stable"}`].map((s, i) => (
+          {[`→ ${data?.recency_trend ? data.recency_trend.charAt(0).toUpperCase() + data.recency_trend.slice(1) : "Stable"}`].map((s, i) => (
             <span key={i} className="text-[11px] text-cp-text-light bg-muted rounded-full px-3 py-1">{s}</span>
           ))}
         </div>

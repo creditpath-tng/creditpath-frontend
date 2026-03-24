@@ -68,7 +68,7 @@ const OfferScreen = () => {
         <div className="h-1.5 w-full bg-gradient-to-r from-primary to-accent" />
         <div className="p-7">
           <p className="text-[13px] text-cp-text-light text-center mb-2">Based on your TNG history, you may qualify for</p>
-          <p className="text-[38px] font-bold text-cp-primary text-center">RM{displayMin} – RM{displayMax}</p>
+          <p className="text-[32px] font-bold text-cp-primary text-center whitespace-nowrap">RM{displayMin} – RM{displayMax}</p>
           <div className="flex justify-center mt-2">
             <span className={`inline-flex items-center rounded-full px-4 py-2 font-semibold text-sm ${tierCfg.bg} ${tierCfg.text}`}>
               {tierCfg.emoji} {tierLabel}

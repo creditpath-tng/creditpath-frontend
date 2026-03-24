@@ -1,136 +1,75 @@
 import { useEffect, useState } from "react";
 import { useAppContext } from "@/context/AppContext";
 import { useNavigation } from "@/hooks/useNavigation";
-import { useToast } from "@/hooks/use-toast";
 import HeaderBar from "@/components/HeaderBar";
-import { scoreUser, explainDecision, getProgress } from "@/services/api";
-
-const MESSAGES = [
-  { text: "Reading your transaction history...", delay: 0 },
-  { text: "Calculating your credit signals...", delay: 900 },
-  { text: "Preparing your result...", delay: 1800 },
-];
-
-const PERSONA_NAMES: Record<string, string> = {
-  aishah: "Aishah",
-  haziq: "Haziq",
-  priya: "Priya",
-};
 
 const LoadingScreen = () => {
-  const { selectedPersona, setScoreData, setExplainData, setProgressData, setError } = useAppContext();
+  const { selectedPersona, setScoreData, setExplainData, setProgressData } = useAppContext();
   const { navigateTo } = useNavigation();
-  const { toast } = useToast();
-  const [visibleCount, setVisibleCount] = useState(0);
-  const [showReady, setShowReady] = useState(false);
-  const [apiError, setApiError] = useState<{
-    message: string;
-    status: string;
-    detail: string;
-  } | null>(null);
+  const [message, setMessage] = useState("Initialising...");
 
   useEffect(() => {
-    const timers: ReturnType<typeof setTimeout>[] = [];
+    if (!selectedPersona) {
+      setMessage("No persona selected, redirecting...");
+      navigateTo("welcome");
+      return;
+    }
 
-    setVisibleCount(0);
-    setShowReady(false);
-    setApiError(null);
-
-    MESSAGES.forEach((msg, i) => {
-      timers.push(
-        setTimeout(() => setVisibleCount(i + 1), msg.delay)
-      );
-    });
-
-    timers.push(setTimeout(() => setShowReady(true), 2200));
-
-    // After messages shown, make real API calls
-    timers.push(setTimeout(async () => {
-      if (!selectedPersona) {
-        navigateTo("welcome");
-        return;
-      }
+    const runAnalysis = async () => {
       try {
-        const scoreResult = await scoreUser(selectedPersona);
-        setScoreData(scoreResult);
+        setMessage("Calling /score...");
 
-        const explainResult = await explainDecision({
-          decision_id: scoreResult.decision_id,
-          tier: scoreResult.tier,
-          score: scoreResult.score,
-          factors: scoreResult.factors,
-        });
-        setExplainData(explainResult);
+        const scoreRes = await fetch(
+          "https://e37fcc4b-dc6d-4821-85bc-7940a9476e3f-00-bxzh6v4v6i34.picard.replit.dev/score",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "Authorization": "Bearer demo-token-creditpath-2026",
+            },
+            body: JSON.stringify({
+              user_id: `${selectedPersona}_001`,
+              persona: selectedPersona,
+            }),
+          }
+        );
 
-        const progressResult = await getProgress(selectedPersona);
-        setProgressData(progressResult);
+        setMessage(`/score status: ${scoreRes.status}`);
 
+        if (!scoreRes.ok) {
+          const errText = await scoreRes.text();
+          setMessage(`/score failed: ${scoreRes.status} — ${errText}`);
+          return;
+        }
+
+        const scoreData = await scoreRes.json();
+        setMessage(`Score received: ${scoreData.score} tier ${scoreData.tier}`);
+        setScoreData(scoreData);
+
+        await new Promise((r) => setTimeout(r, 1000));
         navigateTo("score");
       } catch (err: unknown) {
-        const message = err instanceof Error ? err.message : "Unknown error";
-        const status = "Unknown";
-        const detail = message;
-
-        console.error("API Error:", err);
-        setError(`Unable to connect to scoring service: ${message}`);
-        setApiError({ message, status, detail });
-        toast({
-          variant: "destructive",
-          description: `Connection error — ${message}`,
-        });
+        const msg = err instanceof Error ? err.message : String(err);
+        setMessage(`Caught error: ${msg}`);
       }
-    }, 2400));
+    };
 
-    return () => timers.forEach(clearTimeout);
-  }, [navigateTo, selectedPersona, setError, setExplainData, setProgressData, setScoreData, toast]);
-
-  const personaName = selectedPersona ? PERSONA_NAMES[selectedPersona] : "User";
+    runAnalysis();
+  }, [selectedPersona, navigateTo, setScoreData, setExplainData, setProgressData]);
 
   return (
     <div className="flex flex-col min-h-screen bg-card">
       <HeaderBar />
 
       <div className="flex-1 flex flex-col items-center justify-center px-6">
-        {apiError ? (
-          <div className="w-full max-w-sm rounded-2xl border border-destructive/20 bg-card p-5 shadow-sm">
-            <p className="text-sm font-semibold text-destructive">API Error: {apiError.message}</p>
-            <p className="mt-2 text-sm text-destructive">Status: {apiError.status}</p>
-            <p className="mt-2 text-sm text-destructive">Detail: {apiError.detail}</p>
+        <div className="relative w-16 h-16">
+          <div className="absolute inset-0 rounded-full border-4 border-muted" />
+          <div className="absolute inset-0 rounded-full border-4 border-t-primary border-r-primary border-b-transparent border-l-transparent animate-spin-slow" />
+        </div>
 
-            <button
-              type="button"
-              onClick={() => navigateTo("welcome")}
-              className="mt-5 h-11 w-full rounded-2xl bg-primary px-4 text-sm font-semibold text-primary-foreground transition-all duration-200 hover:brightness-110"
-            >
-              Try Again
-            </button>
-          </div>
-        ) : (
-          <>
-            <div className="relative w-16 h-16">
-              <div className="absolute inset-0 rounded-full border-4 border-muted" />
-              <div className="absolute inset-0 rounded-full border-4 border-t-primary border-r-primary border-b-transparent border-l-transparent animate-spin-slow" />
-            </div>
-
-            <div className="mt-8 space-y-3 text-center">
-              {MESSAGES.map((msg, i) => (
-                <p
-                  key={i}
-                  className={`text-[15px] text-cp-text-med transition-opacity duration-400
-                    ${i < visibleCount ? "animate-fade-in-subtle" : "opacity-0"}`}
-                >
-                  {msg.text}
-                </p>
-              ))}
-            </div>
-
-            {showReady && (
-              <p className="mt-6 text-[13px] text-cp-text-light italic animate-fade-in-subtle">
-                {personaName}'s profile is ready.
-              </p>
-            )}
-          </>
-        )}
+        <p className="mt-8 text-[20px] font-semibold text-foreground text-center max-w-xs">
+          {message}
+        </p>
       </div>
     </div>
   );

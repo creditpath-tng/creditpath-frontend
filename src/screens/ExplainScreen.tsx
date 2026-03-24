@@ -22,11 +22,14 @@ const ExplainScreen = () => {
   const { explainData } = useAppContext();
   const [questsOpen, setQuestsOpen] = useState(false);
 
-  const data = (explainData || FALLBACK) as {
-    headline: string;
-    summary: string;
-    factor_cards: { factor: string; impact: string; plain_language: string }[];
-    nudge_quests: { quest_text: string; estimated_impact: string; direction: string }[];
+  console.log('explainData:', JSON.stringify(explainData));
+
+  const raw = (explainData || FALLBACK) as Record<string, unknown>;
+  const data = {
+    headline: (raw.headline as string) || FALLBACK.headline,
+    summary: (raw.summary as string) || FALLBACK.summary,
+    factor_cards: (raw.factor_cards || raw.factors || raw.factor_list || []) as { factor: string; impact: string; plain_language: string }[],
+    nudge_quests: (raw.nudge_quests || raw.quests || raw.nudges || []) as { quest_text: string; estimated_impact: string; direction: string }[],
   };
 
   return (

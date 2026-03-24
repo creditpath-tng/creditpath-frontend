@@ -23,16 +23,6 @@ const WelcomeScreen = () => {
     navigateTo("loading");
   };
 
-  const handleTestApiConnection = async () => {
-    try {
-      const response = await fetch(HEALTH_URL);
-      const text = await response.text();
-      alert(text);
-    } catch (error) {
-      const message = error instanceof Error ? error.message : "Unknown error";
-      alert(`Error: ${message}`);
-    }
-  };
 
   return (
     <div className="flex flex-col min-h-screen bg-card">

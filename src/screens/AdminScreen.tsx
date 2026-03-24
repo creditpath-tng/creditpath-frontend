@@ -222,7 +222,7 @@ const AdminScreen = () => {
             ))}
             {simResults.map((r) => (
               <div key={r.persona || r.name} className="flex flex-col items-center z-10">
-                <span className="text-xs font-bold text-cp-text-dark mb-1">{r.simulated_score.toFixed(0)}</span>
+                <span className="text-xs font-bold text-cp-text-dark mb-1">{Math.round(r.simulated_score)}</span>
                 <div className={`w-10 ${SIM_COLORS[r.persona] || "bg-cp-primary"} rounded-t-md`} style={{ height: `${(r.simulated_score / 100) * 80}px` }} />
                 <span className="text-[10px] text-cp-text-light mt-1">{r.name}</span>
               </div>

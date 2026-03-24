@@ -45,7 +45,7 @@ const ScoreScreen = () => {
     factors: { display_name: string; normalised_score: number; direction: string; weighted_contribution: number }[];
   } | null;
 
-  const score = data?.score ?? 0;
+  const score = Math.round(data?.score ?? 0);
   const tier = data?.tier ?? 0;
   const tierLabel = data?.tier_label ?? "";
   const tierCfg = TIER_CONFIG[tier] || TIER_CONFIG[0];
@@ -132,7 +132,7 @@ const ScoreScreen = () => {
 
         <div className="mt-4">
           <p className="text-[13px] text-cp-text-med text-center mb-2">
-            You are <span className="font-semibold">{Math.round(pointsToNext * 10) / 10} points</span> from {TIER_CONFIG[nextTierIdx]?.emoji} {nextTierName}
+            You are <span className="font-semibold">{pointsToNext} points</span> from {TIER_CONFIG[nextTierIdx]?.emoji} {nextTierName}
           </p>
           <div className="w-full h-2 rounded-full bg-muted overflow-hidden">
             <div className="h-full rounded-full bg-cp-primary transition-all duration-[1000ms] ease-out" style={{ width: `${tierProgress}%` }} />

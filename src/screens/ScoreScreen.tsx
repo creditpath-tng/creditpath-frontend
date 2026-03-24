@@ -226,6 +226,7 @@ const ScoreScreen = () => {
           📊 My Progress
         </p>
       </div>
+      <BottomNav />
     </div>
   );
 };

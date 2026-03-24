@@ -107,6 +107,7 @@ const OfferScreen = () => {
       >
         ← Back to my score
       </p>
+      <BottomNav />
     </div>
   );
 };

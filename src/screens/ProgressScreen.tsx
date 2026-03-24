@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import BottomNav from "@/components/BottomNav";
 import { useNavigation } from "@/hooks/useNavigation";
 
 const MOCK = {

@@ -107,6 +107,7 @@ const ExplainScreen = () => {
       >
         View audit record →
       </p>
+      <BottomNav />
     </div>
   );
 };

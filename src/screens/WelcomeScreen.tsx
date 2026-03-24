@@ -120,13 +120,6 @@ const WelcomeScreen = () => {
           Analyse My History
         </button>
 
-        <button
-          type="button"
-          onClick={handleTestApiConnection}
-          className="mt-3 h-[52px] w-full rounded-2xl border-2 border-border bg-card text-base font-semibold text-primary transition-all duration-200 hover:border-primary/40 hover:bg-muted/40"
-        >
-          Test API Connection
-        </button>
       </div>
 
       <p

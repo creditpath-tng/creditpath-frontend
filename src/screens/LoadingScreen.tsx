@@ -67,16 +67,9 @@ const LoadingScreen = () => {
 
         navigateTo("score");
       } catch (err: unknown) {
-        const message = axios.isAxiosError(err)
-          ? err.message
-          : err instanceof Error
-            ? err.message
-            : "Unknown error";
-        const status = axios.isAxiosError(err)
-          ? String(err.response?.status ?? "Unknown")
-          : "Unknown";
-        const detailValue = axios.isAxiosError(err) ? err.response?.data?.detail : undefined;
-        const detail = typeof detailValue === "string" ? detailValue : "Unknown";
+        const message = err instanceof Error ? err.message : "Unknown error";
+        const status = "Unknown";
+        const detail = message;
 
         console.error("API Error:", err);
         setError(`Unable to connect to scoring service: ${message}`);

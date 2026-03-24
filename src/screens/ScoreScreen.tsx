@@ -26,6 +26,8 @@ const CIRCUMFERENCE = 2 * Math.PI * 90;
 
 const TIER_THRESHOLDS = [0, 40, 55, 70, 85];
 
+const NEXT_TIER_NAMES: Record<number, string> = { 1: "Builder", 2: "Climber", 3: "Achiever", 4: "Elite" };
+
 const ScoreScreen = () => {
   const { navigateTo } = useNavigation();
   const { scoreData } = useAppContext();
@@ -36,35 +38,29 @@ const ScoreScreen = () => {
   const [tierProgress, setTierProgress] = useState(0);
   const animFrameRef = useRef<number>(0);
 
-  if (!scoreData) {
-    return (
-      <div className="min-h-screen bg-cp-bg flex items-center justify-center">
-        <div className="w-10 h-10 rounded-full border-4 border-muted border-t-primary animate-spin" />
-      </div>
-    );
-  }
-
   const data = scoreData as {
     score: number; tier: number; tier_label: string; segment: string;
     recency_trend: string; persona_name: string;
     qualifying_amount_min: number; qualifying_amount_max: number;
     factors: { display_name: string; normalised_score: number; direction: string; weighted_contribution: number }[];
-  };
+  } | null;
 
-  const tierCfg = TIER_CONFIG[data.tier] || TIER_CONFIG[0];
-  const nextTierIdx = Math.min(data.tier + 1, 4);
+  const score = data?.score ?? 0;
+  const tier = data?.tier ?? 0;
+  const tierLabel = data?.tier_label ?? "";
+  const tierCfg = TIER_CONFIG[tier] || TIER_CONFIG[0];
+  const nextTierIdx = Math.min(tier + 1, 4);
   const nextTierScore = TIER_THRESHOLDS[nextTierIdx];
-  const currentTierStart = TIER_THRESHOLDS[data.tier];
+  const currentTierStart = TIER_THRESHOLDS[tier];
   const progressInTier = nextTierScore > currentTierStart
-    ? ((data.score - currentTierStart) / (nextTierScore - currentTierStart)) * 100
+    ? ((score - currentTierStart) / (nextTierScore - currentTierStart)) * 100
     : 100;
-  const pointsToNext = nextTierScore - data.score;
-
-  const NEXT_TIER_NAMES: Record<number, string> = { 1: "Builder", 2: "Climber", 3: "Achiever", 4: "Elite" };
+  const pointsToNext = nextTierScore - score;
   const nextTierName = NEXT_TIER_NAMES[nextTierIdx] || "Elite";
 
   useEffect(() => {
-    const targetOffset = CIRCUMFERENCE - (data.score / 100) * CIRCUMFERENCE;
+    if (!score) return;
+    const targetOffset = CIRCUMFERENCE - (score / 100) * CIRCUMFERENCE;
     requestAnimationFrame(() => setArcOffset(targetOffset));
 
     const duration = 1200;
@@ -73,7 +69,7 @@ const ScoreScreen = () => {
       const elapsed = now - start;
       const progress = Math.min(elapsed / duration, 1);
       const eased = 1 - Math.pow(1 - progress, 3);
-      setDisplayScore(Math.round(eased * data.score));
+      setDisplayScore(Math.round(eased * score));
       if (progress < 1) animFrameRef.current = requestAnimationFrame(animate);
     };
     animFrameRef.current = requestAnimationFrame(animate);
@@ -88,7 +84,15 @@ const ScoreScreen = () => {
       clearTimeout(barsTimer);
       clearTimeout(tierTimer);
     };
-  }, [data.score]);
+  }, [score]);
+
+  if (!scoreData) {
+    return (
+      <div className="min-h-screen bg-cp-bg flex items-center justify-center">
+        <div className="w-10 h-10 rounded-full border-4 border-muted border-t-primary animate-spin" />
+      </div>
+    );
+  }
 
   let globalBarIndex = 0;
 

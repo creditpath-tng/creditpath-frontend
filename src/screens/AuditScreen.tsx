@@ -59,7 +59,12 @@ const AuditScreen = () => {
       </div>
 
       <div className="mx-4 mt-4">
-        <h2 className="text-sm font-semibold text-cp-text-dark mb-3">Decision History</h2>
+        <div className="flex items-center justify-between mb-3">
+          <h2 className="text-sm font-semibold text-cp-text-dark">Decision History</h2>
+          {entries.length > 0 && (
+            <button onClick={() => setAuditData({ entries: [] })} className="text-[12px] text-cp-danger cursor-pointer">Clear History</button>
+          )}
+        </div>
 
         {loading && (
           <div className="flex justify-center py-8">

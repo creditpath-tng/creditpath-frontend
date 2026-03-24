@@ -108,6 +108,7 @@ const AdminScreen = () => {
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : "Unknown error";
       console.error("Simulation error:", err);
+      setSimError(msg);
       toast({ variant: "destructive", description: `Simulation failed — ${msg}` });
     } finally {
       setSimulating(false);

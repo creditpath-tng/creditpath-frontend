@@ -144,7 +144,7 @@ const ScoreScreen = () => {
       <div className="mx-4 mt-3 rounded-2xl bg-cp-card shadow-sm p-5">
         <h2 className="text-sm font-semibold text-cp-text-dark mb-3">What shaped this score</h2>
         {DIMENSION_GROUPS.map((group, gi) => {
-          const factors = (data.factors || []).filter(f => group.signals.includes(f.display_name));
+          const factors = (data?.factors || []).filter(f => group.signals.includes(f.display_name));
           return (
             <div key={gi} className={gi > 0 ? "mt-4 pt-4 border-t border-border" : ""}>
               <p className={`text-[11px] uppercase tracking-widest font-semibold mb-2 ${group.colorClass}`}>{group.label}</p>

@@ -120,7 +120,7 @@ const ScoreScreen = () => {
 
         <div className="flex justify-center mt-4">
           <span className={`inline-flex items-center rounded-full px-4 py-2 font-semibold text-sm transition-all duration-400 ${tierCfg.bg} ${tierCfg.text} ${showBadge ? "scale-100 opacity-100" : "scale-0 opacity-0"}`} style={{ transitionTimingFunction: "cubic-bezier(0.34, 1.56, 0.64, 1)" }}>
-            {tierCfg.emoji} {data.tier_label}
+            {tierCfg.emoji} {tierLabel}
           </span>
         </div>
 

@@ -1,4 +1,3 @@
-import axios from "axios";
 import { useEffect, useState } from "react";
 import { useAppContext } from "@/context/AppContext";
 import { useNavigation } from "@/hooks/useNavigation";

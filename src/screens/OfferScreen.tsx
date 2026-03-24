@@ -40,7 +40,7 @@ const OfferScreen = () => {
   }, []);
 
   return (
-    <div className="min-h-screen bg-cp-bg relative">
+    <div className="min-h-screen bg-cp-bg relative pb-20">
       <HeaderBar />
 
       {/* Milestone Toast */}

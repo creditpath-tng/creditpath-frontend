@@ -26,16 +26,8 @@ const DEFAULT_WEIGHTS: Record<string, number[]> = {
 
 const RECENCY_OPTIONS = ["Recent Heavy", "Balanced", "Historical"];
 
-interface SimResult {
-  persona: string;
-  name: string;
-  default_tier: number;
-  simulated_tier: number;
-  default_score: number;
-  simulated_score: number;
-  score_delta: number;
-  tier_changed: boolean;
-}
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type SimResult = Record<string, any>;
 
 const AdminScreen = () => {
   const { toast } = useToast();
@@ -47,7 +39,7 @@ const AdminScreen = () => {
   });
   const [recency, setRecency] = useState("Balanced");
   const [simulating, setSimulating] = useState(false);
-  const [simResults, setSimResults] = useState<SimResult[] | null>(null);
+  const [simResults, setSimResults] = useState<SimResult[]>([]);
   const [simError, setSimError] = useState<string | null>(null);
 
   const currentWeights = weights[segment];

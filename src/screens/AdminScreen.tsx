@@ -26,16 +26,8 @@ const DEFAULT_WEIGHTS: Record<string, number[]> = {
 
 const RECENCY_OPTIONS = ["Recent Heavy", "Balanced", "Historical"];
 
-interface SimResult {
-  persona: string;
-  name: string;
-  default_tier: number;
-  simulated_tier: number;
-  default_score: number;
-  simulated_score: number;
-  score_delta: number;
-  tier_changed: boolean;
-}
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type SimResult = Record<string, any>;
 
 const AdminScreen = () => {
   const { toast } = useToast();
@@ -47,7 +39,7 @@ const AdminScreen = () => {
   });
   const [recency, setRecency] = useState("Balanced");
   const [simulating, setSimulating] = useState(false);
-  const [simResults, setSimResults] = useState<SimResult[] | null>(null);
+  const [simResults, setSimResults] = useState<SimResult[]>([]);
   const [simError, setSimError] = useState<string | null>(null);
 
   const currentWeights = weights[segment];
@@ -65,46 +57,16 @@ const AdminScreen = () => {
     setSimulating(true);
     setSimError(null);
     try {
-      const payload = {
+      const result = await simulateConfig({
         segment_weights: {},
         tier_thresholds: {},
         recency_mode: recency.toLowerCase().replace(" ", "_"),
-      };
-      console.log('Simulate payload:', JSON.stringify(payload));
-
-      const response = await fetch(
-        'https://e37fcc4b-dc6d-4821-85bc-7940a9476e3f-00-bxzh6v4v6i34.picard.replit.dev/admin/simulate',
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': 'Bearer admin-token-creditpath-2026'
-          },
-          body: JSON.stringify(payload)
-        }
-      );
-
-      if (!response.ok) {
-        const errText = await response.text();
-        throw new Error(`Simulate failed: ${response.status} — ${errText}`);
-      }
-
-      const result = await response.json();
+      });
       console.log('Simulate result:', JSON.stringify(result));
 
-      // Map API response to SimResult array
-      const results: SimResult[] = (result.results || result.persona_results || []).map((r: Record<string, unknown>) => ({
-        persona: r.persona as string,
-        name: (r.name || r.persona_name || r.persona) as string,
-        default_tier: (r.default_tier ?? r.original_tier ?? 0) as number,
-        simulated_tier: (r.simulated_tier ?? r.sim_tier ?? 0) as number,
-        default_score: (r.default_score ?? r.original_score ?? 0) as number,
-        simulated_score: (r.simulated_score ?? r.sim_score ?? 0) as number,
-        score_delta: (r.score_delta ?? r.delta ?? 0) as number,
-        tier_changed: (r.tier_changed ?? r.changed ?? false) as boolean,
-      }));
-
-      setSimResults(results);
+      // Store raw results array - try multiple field names
+      const rawResults = result.simulation_results || result.results || result.persona_results || [];
+      setSimResults(rawResults);
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : "Unknown error";
       console.error("Simulation error:", err);
@@ -203,25 +165,25 @@ const AdminScreen = () => {
       )}
 
 
-      {simResults && (
+      {simResults.length > 0 && (
         <div className="mx-4 mt-3 rounded-2xl bg-cp-card shadow-sm p-5 animate-fade-in">
           <h2 className="text-sm font-semibold text-cp-text-dark">Live Tier Impact Preview</h2>
           <div className="mt-3 overflow-x-auto">
             <table className="w-full text-xs">
               <thead>
                 <tr className="bg-muted">
-                  {["Persona", "Default", "Sim", "Δ Score", "Changed?"].map((h) => (
+                  {["Persona", "Segment", "Score", "Tier", "Changed?"].map((h) => (
                     <th key={h} className="px-2 py-2 text-left font-semibold text-cp-text-med">{h}</th>
                   ))}
                 </tr>
               </thead>
               <tbody>
-                {simResults.map((r) => (
-                  <tr key={r.persona || r.name} className={r.tier_changed ? "bg-green-50" : ""}>
-                    <td className="px-2 py-2 text-cp-text-dark font-medium">{r.name}</td>
-                    <td className="px-2 py-2 text-cp-text-med">{r.default_tier}</td>
-                    <td className="px-2 py-2 text-cp-text-med">{r.simulated_tier}</td>
-                    <td className="px-2 py-2 text-cp-text-med">{r.score_delta > 0 ? "+" : ""}{r.score_delta.toFixed(1)}</td>
+                {simResults.map((r, i) => (
+                  <tr key={i} className={r.tier_changed ? "bg-green-50" : ""}>
+                    <td className="px-2 py-2 text-cp-text-dark font-medium">{r.persona || r.name || '—'}</td>
+                    <td className="px-2 py-2 text-cp-text-med">{r.segment || '—'}</td>
+                    <td className="px-2 py-2 text-cp-text-med">{Math.round(r.simulated_score ?? r.score ?? 0)}</td>
+                    <td className="px-2 py-2 text-cp-text-med">{r.simulated_tier_label || r.simulated_tier || r.tier || '—'}</td>
                     <td className="px-2 py-2">
                       {r.tier_changed
                         ? <span className="bg-green-100 text-green-700 rounded-full px-2 text-[11px]">✓ Changed</span>
@@ -231,25 +193,6 @@ const AdminScreen = () => {
                 ))}
               </tbody>
             </table>
-          </div>
-        </div>
-      )}
-
-      {/* Score Distribution */}
-      {simResults && (
-        <div className="mx-4 mt-3 mb-8 rounded-2xl bg-cp-card shadow-sm p-5">
-          <h2 className="text-sm font-semibold text-cp-text-dark">Score Distribution (simulated)</h2>
-          <div className="mt-3 flex items-end justify-around h-24 relative">
-            {[25, 50, 75].map((v) => (
-              <div key={v} className="absolute left-0 right-0 border-t border-border" style={{ bottom: `${(v / 100) * 100}%` }} />
-            ))}
-            {simResults.map((r) => (
-              <div key={r.persona || r.name} className="flex flex-col items-center z-10">
-                <span className="text-xs font-bold text-cp-text-dark mb-1">{Math.round(r.simulated_score)}</span>
-                <div className={`w-10 ${SIM_COLORS[r.persona] || "bg-cp-primary"} rounded-t-md`} style={{ height: `${(r.simulated_score / 100) * 80}px` }} />
-                <span className="text-[10px] text-cp-text-light mt-1">{r.name}</span>
-              </div>
-            ))}
           </div>
         </div>
       )}

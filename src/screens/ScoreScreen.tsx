@@ -97,7 +97,7 @@ const ScoreScreen = () => {
   let globalBarIndex = 0;
 
   return (
-    <div className="min-h-screen bg-cp-bg pb-20">
+    <div className="min-h-screen bg-cp-bg pb-24">
       <HeaderBar />
       <div className="px-4 pt-1 pb-2">
         <h1 className="text-[15px] font-semibold text-cp-text-dark mt-3 mb-1">Your Credit Readiness</h1>
@@ -125,7 +125,7 @@ const ScoreScreen = () => {
         </div>
 
         <div className="flex items-center justify-center gap-1.5 mt-3 flex-wrap">
-          {[`📊 ${data?.recency_trend ? data.recency_trend.charAt(0).toUpperCase() + data.recency_trend.slice(1) : "Stable"}`].map((s, i) => (
+          {[`→ ${data?.recency_trend ? data.recency_trend.charAt(0).toUpperCase() + data.recency_trend.slice(1) : "Stable"}`].map((s, i) => (
             <span key={i} className="text-[11px] text-cp-text-light bg-muted rounded-full px-3 py-1">{s}</span>
           ))}
         </div>
@@ -144,7 +144,7 @@ const ScoreScreen = () => {
       <div className="mx-4 mt-3 rounded-2xl bg-cp-card shadow-sm p-5">
         <h2 className="text-sm font-semibold text-cp-text-dark mb-3">What shaped this score</h2>
         {DIMENSION_GROUPS.map((group, gi) => {
-          const factors = (data?.factors || []).filter(f => group.signals.includes(f.display_name));
+          const factors = (data?.factors || []).filter(f => group.signals.includes(f.display_name) || group.signals.some(s => f.display_name?.toLowerCase() === s.toLowerCase()));
           return (
             <div key={gi} className={gi > 0 ? "mt-4 pt-4 border-t border-border" : ""}>
               <p className={`text-[11px] uppercase tracking-widest font-semibold mb-2 ${group.colorClass}`}>{group.label}</p>
@@ -155,7 +155,7 @@ const ScoreScreen = () => {
                     <div key={factor.display_name}>
                       <div className="flex items-center justify-between mb-1">
                         <span className="text-[13px] text-cp-text-dark truncate mr-2">{factor.display_name}</span>
-                        <span className={`text-xs font-medium ${DIRECTION_COLORS[factor.direction]}`}>{Math.round(factor.normalised_score * 10) / 10}</span>
+                        <span className={`text-xs font-medium ${DIRECTION_COLORS[factor.direction]}`}>{Math.round(factor.normalised_score)}</span>
                       </div>
                       <div className="w-full h-2 rounded-full bg-muted overflow-hidden">
                         <div className={`h-full rounded-full ${DIRECTION_BAR_COLORS[factor.direction]} transition-all duration-[800ms] ease-out`} style={{ width: barsAnimated ? `${factor.normalised_score}%` : "0%", transitionDelay: `${barIndex * 60}ms` }} />

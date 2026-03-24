@@ -66,8 +66,8 @@ const WelcomeScreen = () => {
             );
           })}
         </div>
-        {activePersona && (
-          <p className="text-xs text-cp-text-light mt-2 animate-fade-in">
+      {activePersona && (
+          <p className="text-xs text-cp-text-light mt-2">
             {activePersona.subtitle}
           </p>
         )}
@@ -75,7 +75,7 @@ const WelcomeScreen = () => {
 
       {/* Level Preview Teaser */}
       {activePersona && (
-        <div className="mx-4 mt-4 animate-fade-in">
+        <div className="mx-4 mt-4">
           <div className="bg-cp-bg rounded-xl px-4 py-3">
             <p className="text-[13px] text-cp-text-dark">
               {activePersona.level.split(" ")[0]}{" "}

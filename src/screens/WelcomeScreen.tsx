@@ -3,7 +3,7 @@ import { useAppContext, Persona } from "@/context/AppContext";
 import { useNavigation } from "@/hooks/useNavigation";
 import HeaderBar from "@/components/HeaderBar";
 
-const HEALTH_URL = "https://e37fcc4b-dc6d-4821-85bc-7940a9476e3f-00-bxzh6v4v6i34.picard.replit.dev/health";
+
 
 const PERSONAS: { id: Persona; label: string; subtitle: string; level: string }[] = [
   { id: "aishah", label: "Aishah 22", subtitle: "University student", level: "🔥 Climber potential" },
@@ -23,16 +23,6 @@ const WelcomeScreen = () => {
     navigateTo("loading");
   };
 
-  const handleTestApiConnection = async () => {
-    try {
-      const response = await fetch(HEALTH_URL);
-      const text = await response.text();
-      alert(text);
-    } catch (error) {
-      const message = error instanceof Error ? error.message : "Unknown error";
-      alert(`Error: ${message}`);
-    }
-  };
 
   return (
     <div className="flex flex-col min-h-screen bg-card">
@@ -130,13 +120,6 @@ const WelcomeScreen = () => {
           Analyse My History
         </button>
 
-        <button
-          type="button"
-          onClick={handleTestApiConnection}
-          className="mt-3 h-[52px] w-full rounded-2xl border-2 border-border bg-card text-base font-semibold text-primary transition-all duration-200 hover:border-primary/40 hover:bg-muted/40"
-        >
-          Test API Connection
-        </button>
       </div>
 
       <p

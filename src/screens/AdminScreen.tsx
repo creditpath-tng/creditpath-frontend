@@ -77,12 +77,15 @@ const AdminScreen = () => {
         }
       }
 
-      const result = await simulateConfig({
+      const payload = {
         segment_weights: decimalWeights,
         tier_thresholds: {},
         recency_mode: recency.toLowerCase().replace(" ", "_"),
-      });
-      console.log('Simulate result:', JSON.stringify(result));
+      };
+      console.log('Simulation payload:', JSON.stringify(payload, null, 2));
+
+      const result = await simulateConfig(payload);
+      console.log('Simulation result:', JSON.stringify(result, null, 2));
       const rawResults = result.simulation_results || result.results || result.persona_results || [];
       setSimResults(rawResults);
     } catch (err: unknown) {

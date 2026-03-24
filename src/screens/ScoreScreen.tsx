@@ -1,5 +1,6 @@
 import { useEffect, useState, useRef } from "react";
 import HeaderBar from "@/components/HeaderBar";
+import BottomNav from "@/components/BottomNav";
 import { useNavigation } from "@/hooks/useNavigation";
 
 const MOCK_SCORE_DATA = {

@@ -97,7 +97,7 @@ const ScoreScreen = () => {
   let globalBarIndex = 0;
 
   return (
-    <div className="min-h-screen bg-cp-bg pb-20">
+    <div className="min-h-screen bg-cp-bg pb-24">
       <HeaderBar />
       <div className="px-4 pt-1 pb-2">
         <h1 className="text-[15px] font-semibold text-cp-text-dark mt-3 mb-1">Your Credit Readiness</h1>

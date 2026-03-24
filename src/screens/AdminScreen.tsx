@@ -123,13 +123,13 @@ const AdminScreen = () => {
           <span className={`text-sm font-bold ${total === 100 ? "text-cp-success" : "text-cp-danger"}`}>Total: {total}%</span>
         </div>
         <div className="mt-4 space-y-3">
-          {SIGNAL_NAMES.map((name, i) => (
-            <div key={name}>
+          {SIGNAL_KEYS.map((key, i) => (
+            <div key={key}>
               <div className="flex items-center justify-between mb-1">
-                <span className="text-[13px] text-cp-text-dark truncate mr-2">{name}</span>
-                <span className="text-xs text-cp-primary font-bold w-8 text-right">{currentWeights[i]}%</span>
+                <span className="text-[13px] text-cp-text-dark truncate mr-2">{SIGNAL_NAMES[i]}</span>
+                <span className="text-xs text-cp-primary font-bold w-8 text-right">{currentWeights[key]}%</span>
               </div>
-              <input type="range" min={1} max={30} step={1} value={currentWeights[i]} onChange={(e) => updateWeight(i, Number(e.target.value))} className="w-full h-2 rounded-full appearance-none bg-muted accent-primary cursor-pointer" />
+              <input type="range" min={1} max={30} step={1} value={currentWeights[key]} onChange={(e) => updateWeight(key, Number(e.target.value))} className="w-full h-2 rounded-full appearance-none bg-muted accent-primary cursor-pointer" />
             </div>
           ))}
         </div>

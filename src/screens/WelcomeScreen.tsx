@@ -66,8 +66,8 @@ const WelcomeScreen = () => {
             );
           })}
         </div>
-        {activePersona && (
-          <p className="text-xs text-cp-text-light mt-2 animate-fade-in">
+      {activePersona && (
+          <p className="text-xs text-cp-text-light mt-2">
             {activePersona.subtitle}
           </p>
         )}

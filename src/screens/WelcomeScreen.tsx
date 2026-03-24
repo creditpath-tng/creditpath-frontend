@@ -3,7 +3,7 @@ import { useAppContext, Persona } from "@/context/AppContext";
 import { useNavigation } from "@/hooks/useNavigation";
 import HeaderBar from "@/components/HeaderBar";
 
-const HEALTH_URL = "https://e37fcc4b-dc6d-4821-85bc-7940a9476e3f-00-bxzh6v4v6i34.picard.replit.dev/health";
+
 
 const PERSONAS: { id: Persona; label: string; subtitle: string; level: string }[] = [
   { id: "aishah", label: "Aishah 22", subtitle: "University student", level: "🔥 Climber potential" },

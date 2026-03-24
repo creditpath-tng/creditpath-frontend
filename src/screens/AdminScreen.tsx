@@ -165,25 +165,25 @@ const AdminScreen = () => {
       )}
 
 
-      {simResults && (
+      {simResults.length > 0 && (
         <div className="mx-4 mt-3 rounded-2xl bg-cp-card shadow-sm p-5 animate-fade-in">
           <h2 className="text-sm font-semibold text-cp-text-dark">Live Tier Impact Preview</h2>
           <div className="mt-3 overflow-x-auto">
             <table className="w-full text-xs">
               <thead>
                 <tr className="bg-muted">
-                  {["Persona", "Default", "Sim", "Δ Score", "Changed?"].map((h) => (
+                  {["Persona", "Segment", "Score", "Tier", "Changed?"].map((h) => (
                     <th key={h} className="px-2 py-2 text-left font-semibold text-cp-text-med">{h}</th>
                   ))}
                 </tr>
               </thead>
               <tbody>
-                {simResults.map((r) => (
-                  <tr key={r.persona || r.name} className={r.tier_changed ? "bg-green-50" : ""}>
-                    <td className="px-2 py-2 text-cp-text-dark font-medium">{r.name}</td>
-                    <td className="px-2 py-2 text-cp-text-med">{r.default_tier}</td>
-                    <td className="px-2 py-2 text-cp-text-med">{r.simulated_tier}</td>
-                    <td className="px-2 py-2 text-cp-text-med">{r.score_delta > 0 ? "+" : ""}{r.score_delta.toFixed(1)}</td>
+                {simResults.map((r, i) => (
+                  <tr key={i} className={r.tier_changed ? "bg-green-50" : ""}>
+                    <td className="px-2 py-2 text-cp-text-dark font-medium">{r.persona || r.name || '—'}</td>
+                    <td className="px-2 py-2 text-cp-text-med">{r.segment || '—'}</td>
+                    <td className="px-2 py-2 text-cp-text-med">{Math.round(r.simulated_score ?? r.score ?? 0)}</td>
+                    <td className="px-2 py-2 text-cp-text-med">{r.simulated_tier_label || r.simulated_tier || r.tier || '—'}</td>
                     <td className="px-2 py-2">
                       {r.tier_changed
                         ? <span className="bg-green-100 text-green-700 rounded-full px-2 text-[11px]">✓ Changed</span>
@@ -193,25 +193,6 @@ const AdminScreen = () => {
                 ))}
               </tbody>
             </table>
-          </div>
-        </div>
-      )}
-
-      {/* Score Distribution */}
-      {simResults && (
-        <div className="mx-4 mt-3 mb-8 rounded-2xl bg-cp-card shadow-sm p-5">
-          <h2 className="text-sm font-semibold text-cp-text-dark">Score Distribution (simulated)</h2>
-          <div className="mt-3 flex items-end justify-around h-24 relative">
-            {[25, 50, 75].map((v) => (
-              <div key={v} className="absolute left-0 right-0 border-t border-border" style={{ bottom: `${(v / 100) * 100}%` }} />
-            ))}
-            {simResults.map((r) => (
-              <div key={r.persona || r.name} className="flex flex-col items-center z-10">
-                <span className="text-xs font-bold text-cp-text-dark mb-1">{Math.round(r.simulated_score)}</span>
-                <div className={`w-10 ${SIM_COLORS[r.persona] || "bg-cp-primary"} rounded-t-md`} style={{ height: `${(r.simulated_score / 100) * 80}px` }} />
-                <span className="text-[10px] text-cp-text-light mt-1">{r.name}</span>
-              </div>
-            ))}
           </div>
         </div>
       )}

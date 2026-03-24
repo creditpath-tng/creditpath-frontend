@@ -218,6 +218,12 @@ const ScoreScreen = () => {
         >
           See Your Loan Offer →
         </button>
+        <p
+          className="text-center text-[13px] text-cp-primary cursor-pointer mt-2"
+          onClick={() => navigateTo("progress")}
+        >
+          📊 My Progress
+        </p>
       </div>
     </div>
   );

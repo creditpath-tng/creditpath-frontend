@@ -22,11 +22,14 @@ const ExplainScreen = () => {
   const { explainData } = useAppContext();
   const [questsOpen, setQuestsOpen] = useState(false);
 
-  const data = (explainData || FALLBACK) as {
-    headline: string;
-    summary: string;
-    factor_cards: { factor: string; impact: string; plain_language: string }[];
-    nudge_quests: { quest_text: string; estimated_impact: string; direction: string }[];
+  console.log('explainData:', JSON.stringify(explainData));
+
+  const raw = (explainData || FALLBACK) as Record<string, unknown>;
+  const data = {
+    headline: (raw.headline as string) || FALLBACK.headline,
+    summary: (raw.summary as string) || FALLBACK.summary,
+    factor_cards: (raw.factor_cards || raw.factors || raw.factor_list || []) as { factor: string; impact: string; plain_language: string }[],
+    nudge_quests: (raw.nudge_quests || raw.quests || raw.nudges || []) as { quest_text: string; estimated_impact: string; direction: string }[],
   };
 
   return (
@@ -45,7 +48,10 @@ const ExplainScreen = () => {
       {/* Factor Cards */}
       <div className="mx-4 mt-4">
         <p className="text-[11px] uppercase tracking-widest text-cp-text-light mb-3">Factors Reviewed</p>
-        {(data.factor_cards || []).map((card) => {
+        {data.factor_cards.length === 0 && (
+          <p className="text-sm text-cp-text-med italic">Factor details loading...</p>
+        )}
+        {data.factor_cards.map((card) => {
           const cfg = IMPACT_CONFIG[card.impact] || IMPACT_CONFIG.neutral;
           return (
             <div key={card.factor} className="rounded-xl bg-cp-card shadow-sm border border-border p-4 mb-3 flex items-start gap-3">

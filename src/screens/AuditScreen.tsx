@@ -59,7 +59,12 @@ const AuditScreen = () => {
       </div>
 
       <div className="mx-4 mt-4">
-        <h2 className="text-sm font-semibold text-cp-text-dark mb-3">Decision History</h2>
+        <div className="flex items-center justify-between mb-3">
+          <h2 className="text-sm font-semibold text-cp-text-dark">Decision History</h2>
+          {entries.length > 0 && (
+            <button onClick={() => setAuditData({ entries: [] })} className="text-[12px] text-cp-danger cursor-pointer">Clear History</button>
+          )}
+        </div>
 
         {loading && (
           <div className="flex justify-center py-8">
@@ -78,8 +83,8 @@ const AuditScreen = () => {
               <div className="p-4 cursor-pointer" onClick={() => setExpandedIdx(isOpen ? -1 : i)}>
                 <div className="flex items-center justify-between">
                   <span className="text-[13px] text-cp-text-med">{formatDate(entry.timestamp)}</span>
-                  <span className={`rounded-full px-2 py-0.5 text-[11px] font-semibold ${entry.admp_compliant ? "bg-green-100 text-green-700" : "bg-muted text-cp-text-light"}`}>
-                    {entry.admp_compliant ? "ADMP ✓" : "Pending"}
+                  <span className={`rounded-full px-2 py-0.5 text-[11px] font-semibold ${(entry.admp_compliant || entry.explanation_generated) ? "bg-green-100 text-green-700" : "bg-muted text-cp-text-light"}`}>
+                    {(entry.admp_compliant || entry.explanation_generated) ? "ADMP ✓" : "Pending"}
                   </span>
                 </div>
                 <p className="text-[13px] text-cp-text-dark font-medium mt-1">Credit Tier {entry.tier} · Score: {Math.round(entry.score)}/100</p>

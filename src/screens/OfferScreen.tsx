@@ -59,7 +59,7 @@ const OfferScreen = () => {
       <HeaderBar />
 
       {/* Milestone Toast */}
-      <div className={`absolute left-0 right-0 top-14 z-10 bg-cp-success text-white rounded-b-2xl px-4 py-3 text-center text-sm font-medium transition-all duration-500 ${showToast ? "translate-y-0 opacity-100" : "-translate-y-full opacity-0"}`}>
+      <div className={`absolute left-0 right-0 top-14 z-10 bg-primary text-primary-foreground rounded-b-2xl px-4 py-3 text-center text-sm font-medium transition-all duration-500 ${showToast ? "translate-y-0 opacity-100" : "-translate-y-full opacity-0"}`}>
         🎉 Level up! You've reached {tierLabel}
       </div>
 

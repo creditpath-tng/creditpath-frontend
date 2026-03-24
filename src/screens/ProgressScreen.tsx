@@ -4,7 +4,7 @@ import { useNavigation } from "@/hooks/useNavigation";
 import { useAppContext } from "@/context/AppContext";
 
 const LEVELS = [
-  { emoji: "🌱", label: "Starter" },
+  { emoji: "S", label: "Starter" },
   { emoji: "⚡", label: "Builder" },
   { emoji: "🔥", label: "Climber" },
   { emoji: "🏆", label: "Achiever" },

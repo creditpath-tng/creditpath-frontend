@@ -48,6 +48,7 @@ const AdminScreen = () => {
   const [recency, setRecency] = useState("Balanced");
   const [simulating, setSimulating] = useState(false);
   const [simResults, setSimResults] = useState<SimResult[] | null>(null);
+  const [simError, setSimError] = useState<string | null>(null);
 
   const currentWeights = weights[segment];
   const total = currentWeights.reduce((a, b) => a + b, 0);

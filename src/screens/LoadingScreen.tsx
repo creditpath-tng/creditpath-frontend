@@ -1,7 +1,9 @@
 import { useEffect, useState } from "react";
 import { useAppContext } from "@/context/AppContext";
 import { useNavigation } from "@/hooks/useNavigation";
+import { useToast } from "@/hooks/use-toast";
 import HeaderBar from "@/components/HeaderBar";
+import { scoreUser, explainDecision, getProgress } from "@/services/api";
 
 const MESSAGES = [
   { text: "Reading your transaction history...", delay: 0 },
@@ -16,8 +18,9 @@ const PERSONA_NAMES: Record<string, string> = {
 };
 
 const LoadingScreen = () => {
-  const { selectedPersona } = useAppContext();
+  const { selectedPersona, setScoreData, setExplainData, setProgressData, setError } = useAppContext();
   const { navigateTo } = useNavigation();
+  const { toast } = useToast();
   const [visibleCount, setVisibleCount] = useState(0);
   const [showReady, setShowReady] = useState(false);
 
@@ -31,10 +34,43 @@ const LoadingScreen = () => {
     });
 
     timers.push(setTimeout(() => setShowReady(true), 2200));
-    timers.push(setTimeout(() => navigateTo("score"), 3200));
+
+    // After messages shown, make real API calls
+    timers.push(setTimeout(async () => {
+      if (!selectedPersona) {
+        navigateTo("welcome");
+        return;
+      }
+      try {
+        const scoreResult = await scoreUser(selectedPersona);
+        setScoreData(scoreResult);
+
+        const explainResult = await explainDecision({
+          decision_id: scoreResult.decision_id,
+          tier: scoreResult.tier,
+          score: scoreResult.score,
+          factors: scoreResult.factors,
+        });
+        setExplainData(explainResult);
+
+        const progressResult = await getProgress(selectedPersona);
+        setProgressData(progressResult);
+
+        navigateTo("score");
+      } catch (err: unknown) {
+        const message = err instanceof Error ? err.message : "Unknown error";
+        console.error("API Error:", err);
+        setError(`Unable to connect to scoring service: ${message}`);
+        toast({
+          variant: "destructive",
+          description: `Connection error — ${message}`,
+        });
+        navigateTo("welcome");
+      }
+    }, 2400));
 
     return () => timers.forEach(clearTimeout);
-  }, [navigateTo]);
+  }, [navigateTo, selectedPersona]);
 
   const personaName = selectedPersona ? PERSONA_NAMES[selectedPersona] : "User";
 
@@ -43,13 +79,11 @@ const LoadingScreen = () => {
       <HeaderBar />
 
       <div className="flex-1 flex flex-col items-center justify-center px-6">
-        {/* Spinner */}
         <div className="relative w-16 h-16">
           <div className="absolute inset-0 rounded-full border-4 border-muted" />
           <div className="absolute inset-0 rounded-full border-4 border-t-primary border-r-primary border-b-transparent border-l-transparent animate-spin-slow" />
         </div>
 
-        {/* Sequential messages */}
         <div className="mt-8 space-y-3 text-center">
           {MESSAGES.map((msg, i) => (
             <p
@@ -62,7 +96,6 @@ const LoadingScreen = () => {
           ))}
         </div>
 
-        {/* Ready message */}
         {showReady && (
           <p className="mt-6 text-[13px] text-cp-text-light italic animate-fade-in-subtle">
             {personaName}'s profile is ready.

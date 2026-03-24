@@ -48,6 +48,7 @@ const AdminScreen = () => {
   const [recency, setRecency] = useState("Balanced");
   const [simulating, setSimulating] = useState(false);
   const [simResults, setSimResults] = useState<SimResult[] | null>(null);
+  const [simError, setSimError] = useState<string | null>(null);
 
   const currentWeights = weights[segment];
   const total = currentWeights.reduce((a, b) => a + b, 0);
@@ -62,20 +63,34 @@ const AdminScreen = () => {
 
   const runSim = async () => {
     setSimulating(true);
+    setSimError(null);
     try {
-      // Build segment_weights payload from all segments
-      const segmentWeights: Record<string, Record<string, number>> = {};
-      for (const seg of SEGMENT_KEYS) {
-        const sw: Record<string, number> = {};
-        SIGNAL_KEYS.forEach((key, i) => { sw[key] = weights[seg][i]; });
-        segmentWeights[seg] = sw;
-      }
-
-      const result = await simulateConfig({
-        segment_weights: segmentWeights,
+      const payload = {
+        segment_weights: {},
         tier_thresholds: {},
         recency_mode: recency.toLowerCase().replace(" ", "_"),
-      });
+      };
+      console.log('Simulate payload:', JSON.stringify(payload));
+
+      const response = await fetch(
+        'https://e37fcc4b-dc6d-4821-85bc-7940a9476e3f-00-bxzh6v4v6i34.picard.replit.dev/admin/simulate',
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer admin-token-creditpath-2026'
+          },
+          body: JSON.stringify(payload)
+        }
+      );
+
+      if (!response.ok) {
+        const errText = await response.text();
+        throw new Error(`Simulate failed: ${response.status} — ${errText}`);
+      }
+
+      const result = await response.json();
+      console.log('Simulate result:', JSON.stringify(result));
 
       // Map API response to SimResult array
       const results: SimResult[] = (result.results || result.persona_results || []).map((r: Record<string, unknown>) => ({
@@ -93,6 +108,7 @@ const AdminScreen = () => {
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : "Unknown error";
       console.error("Simulation error:", err);
+      setSimError(msg);
       toast({ variant: "destructive", description: `Simulation failed — ${msg}` });
     } finally {
       setSimulating(false);
@@ -179,7 +195,14 @@ const AdminScreen = () => {
         </button>
       </div>
 
-      {/* Simulation Results */}
+      {/* Error Display */}
+      {simError && (
+        <div className="mx-4 mt-2 rounded-xl bg-destructive/10 border border-destructive p-3">
+          <p className="text-sm text-destructive font-medium break-all">{simError}</p>
+        </div>
+      )}
+
+
       {simResults && (
         <div className="mx-4 mt-3 rounded-2xl bg-cp-card shadow-sm p-5 animate-fade-in">
           <h2 className="text-sm font-semibold text-cp-text-dark">Live Tier Impact Preview</h2>

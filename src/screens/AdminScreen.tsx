@@ -195,7 +195,14 @@ const AdminScreen = () => {
         </button>
       </div>
 
-      {/* Simulation Results */}
+      {/* Error Display */}
+      {simError && (
+        <div className="mx-4 mt-2 rounded-xl bg-destructive/10 border border-destructive p-3">
+          <p className="text-sm text-destructive font-medium break-all">{simError}</p>
+        </div>
+      )}
+
+
       {simResults && (
         <div className="mx-4 mt-3 rounded-2xl bg-cp-card shadow-sm p-5 animate-fade-in">
           <h2 className="text-sm font-semibold text-cp-text-dark">Live Tier Impact Preview</h2>

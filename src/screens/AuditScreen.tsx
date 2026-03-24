@@ -82,7 +82,7 @@ const AuditScreen = () => {
                     {entry.admp_compliant ? "ADMP ✓" : "Pending"}
                   </span>
                 </div>
-                <p className="text-[13px] text-cp-text-dark font-medium mt-1">Credit Tier {entry.tier} · Score: {entry.score}/100</p>
+                <p className="text-[13px] text-cp-text-dark font-medium mt-1">Credit Tier {entry.tier} · Score: {Math.round(entry.score)}/100</p>
                 <p className="text-[11px] text-cp-text-light mt-1">↕ View details</p>
               </div>
               <div className={`overflow-hidden transition-all duration-300 ${isOpen ? "max-h-48" : "max-h-0"}`}>

@@ -48,7 +48,10 @@ const ExplainScreen = () => {
       {/* Factor Cards */}
       <div className="mx-4 mt-4">
         <p className="text-[11px] uppercase tracking-widest text-cp-text-light mb-3">Factors Reviewed</p>
-        {(data.factor_cards || []).map((card) => {
+        {data.factor_cards.length === 0 && (
+          <p className="text-sm text-cp-text-med italic">Factor details loading...</p>
+        )}
+        {data.factor_cards.map((card) => {
           const cfg = IMPACT_CONFIG[card.impact] || IMPACT_CONFIG.neutral;
           return (
             <div key={card.factor} className="rounded-xl bg-cp-card shadow-sm border border-border p-4 mb-3 flex items-start gap-3">

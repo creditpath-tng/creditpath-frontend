@@ -76,7 +76,7 @@ const ProgressScreen = () => {
   };
 
   return (
-    <div className="min-h-screen bg-cp-bg">
+    <div className="min-h-screen bg-cp-bg pb-20">
       {/* Header */}
       <div className="flex items-center justify-between px-5 h-14 bg-primary">
         <div className="flex items-center gap-3">

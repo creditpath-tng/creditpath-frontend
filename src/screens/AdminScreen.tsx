@@ -6,22 +6,34 @@ import BottomNav from "@/components/BottomNav";
 const SEGMENT_KEYS = ["student", "early_career", "irregular"] as const;
 const SEGMENT_LABELS: Record<string, string> = { student: "Student", early_career: "Early Career", irregular: "Irregular" };
 
+const SIGNAL_KEYS = [
+  "bill_payment_consistency", "bill_payment_variety", "payment_timing_regularity", "reload_frequency",
+  "reload_amount_consistency", "time_to_spend_after_reload", "balance_floor_maintenance", "spending_regularity",
+  "essential_vs_discretionary", "transaction_diversity", "go_plus_participation", "account_activity_trend",
+];
+
 const SIGNAL_NAMES = [
   "Bill Consistency", "Bill Variety", "Payment Timing", "Reload Freq",
   "Reload Consistency", "Time-to-Spend", "Balance Floor", "Spend Regularity",
   "Essential Ratio", "Tx Diversity", "GO+ Participation", "Activity Trend",
 ];
 
-const SIGNAL_KEYS = [
-  "bill_consistency", "bill_variety", "payment_timing", "reload_freq",
-  "reload_consistency", "time_to_spend", "balance_floor", "spend_regularity",
-  "essential_ratio", "tx_diversity", "go_plus", "activity_trend",
-];
-
-const DEFAULT_WEIGHTS: Record<string, number[]> = {
-  student: [12, 9, 8, 7, 8, 6, 6, 9, 8, 5, 8, 14],
-  early_career: [10, 8, 7, 8, 7, 6, 7, 8, 8, 6, 12, 13],
-  irregular: [10, 7, 6, 7, 6, 5, 7, 7, 8, 9, 10, 18],
+const DEFAULT_WEIGHTS: Record<string, Record<string, number>> = {
+  student: {
+    bill_payment_consistency: 12, bill_payment_variety: 9, payment_timing_regularity: 8, reload_frequency: 7,
+    reload_amount_consistency: 8, time_to_spend_after_reload: 6, balance_floor_maintenance: 6, spending_regularity: 9,
+    essential_vs_discretionary: 8, transaction_diversity: 5, go_plus_participation: 8, account_activity_trend: 14,
+  },
+  early_career: {
+    bill_payment_consistency: 10, bill_payment_variety: 8, payment_timing_regularity: 7, reload_frequency: 8,
+    reload_amount_consistency: 7, time_to_spend_after_reload: 6, balance_floor_maintenance: 7, spending_regularity: 8,
+    essential_vs_discretionary: 8, transaction_diversity: 6, go_plus_participation: 12, account_activity_trend: 13,
+  },
+  irregular: {
+    bill_payment_consistency: 10, bill_payment_variety: 7, payment_timing_regularity: 6, reload_frequency: 7,
+    reload_amount_consistency: 6, time_to_spend_after_reload: 5, balance_floor_maintenance: 7, spending_regularity: 7,
+    essential_vs_discretionary: 8, transaction_diversity: 9, go_plus_participation: 10, account_activity_trend: 18,
+  },
 };
 
 const RECENCY_OPTIONS = ["Recent Heavy", "Balanced", "Historical"];
@@ -32,9 +44,9 @@ type SimResult = Record<string, any>;
 const AdminScreen = () => {
   const { toast } = useToast();
   const [segment, setSegment] = useState<string>("student");
-  const [weights, setWeights] = useState<Record<string, number[]>>(() => {
-    const w: Record<string, number[]> = {};
-    for (const k of SEGMENT_KEYS) w[k] = [...DEFAULT_WEIGHTS[k]];
+  const [weights, setWeights] = useState<Record<string, Record<string, number>>>(() => {
+    const w: Record<string, Record<string, number>> = {};
+    for (const k of SEGMENT_KEYS) w[k] = { ...DEFAULT_WEIGHTS[k] };
     return w;
   });
   const [recency, setRecency] = useState("Balanced");
@@ -43,28 +55,34 @@ const AdminScreen = () => {
   const [simError, setSimError] = useState<string | null>(null);
 
   const currentWeights = weights[segment];
-  const total = currentWeights.reduce((a, b) => a + b, 0);
+  const total = SIGNAL_KEYS.reduce((sum, key) => sum + (currentWeights[key] || 0), 0);
 
-  const updateWeight = (idx: number, val: number) => {
-    setWeights((prev) => {
-      const next = { ...prev, [segment]: [...prev[segment]] };
-      next[segment][idx] = val;
-      return next;
-    });
+  const updateWeight = (signalKey: string, val: number) => {
+    setWeights((prev) => ({
+      ...prev,
+      [segment]: { ...prev[segment], [signalKey]: val },
+    }));
   };
 
   const runSim = async () => {
     setSimulating(true);
     setSimError(null);
     try {
+      // Convert integer percentages to decimals
+      const decimalWeights: Record<string, Record<string, number>> = {};
+      for (const seg of SEGMENT_KEYS) {
+        decimalWeights[seg] = {};
+        for (const key of SIGNAL_KEYS) {
+          decimalWeights[seg][key] = (weights[seg][key] || 0) / 100;
+        }
+      }
+
       const result = await simulateConfig({
-        segment_weights: {},
+        segment_weights: decimalWeights,
         tier_thresholds: {},
         recency_mode: recency.toLowerCase().replace(" ", "_"),
       });
       console.log('Simulate result:', JSON.stringify(result));
-
-      // Store raw results array - try multiple field names
       const rawResults = result.simulation_results || result.results || result.persona_results || [];
       setSimResults(rawResults);
     } catch (err: unknown) {
@@ -105,13 +123,13 @@ const AdminScreen = () => {
           <span className={`text-sm font-bold ${total === 100 ? "text-cp-success" : "text-cp-danger"}`}>Total: {total}%</span>
         </div>
         <div className="mt-4 space-y-3">
-          {SIGNAL_NAMES.map((name, i) => (
-            <div key={name}>
+          {SIGNAL_KEYS.map((key, i) => (
+            <div key={key}>
               <div className="flex items-center justify-between mb-1">
-                <span className="text-[13px] text-cp-text-dark truncate mr-2">{name}</span>
-                <span className="text-xs text-cp-primary font-bold w-8 text-right">{currentWeights[i]}%</span>
+                <span className="text-[13px] text-cp-text-dark truncate mr-2">{SIGNAL_NAMES[i]}</span>
+                <span className="text-xs text-cp-primary font-bold w-8 text-right">{currentWeights[key]}%</span>
               </div>
-              <input type="range" min={1} max={30} step={1} value={currentWeights[i]} onChange={(e) => updateWeight(i, Number(e.target.value))} className="w-full h-2 rounded-full appearance-none bg-muted accent-primary cursor-pointer" />
+              <input type="range" min={1} max={30} step={1} value={currentWeights[key]} onChange={(e) => updateWeight(key, Number(e.target.value))} className="w-full h-2 rounded-full appearance-none bg-muted accent-primary cursor-pointer" />
             </div>
           ))}
         </div>

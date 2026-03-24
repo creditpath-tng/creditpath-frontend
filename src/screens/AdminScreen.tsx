@@ -65,46 +65,16 @@ const AdminScreen = () => {
     setSimulating(true);
     setSimError(null);
     try {
-      const payload = {
+      const result = await simulateConfig({
         segment_weights: {},
         tier_thresholds: {},
         recency_mode: recency.toLowerCase().replace(" ", "_"),
-      };
-      console.log('Simulate payload:', JSON.stringify(payload));
-
-      const response = await fetch(
-        'https://e37fcc4b-dc6d-4821-85bc-7940a9476e3f-00-bxzh6v4v6i34.picard.replit.dev/admin/simulate',
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': 'Bearer admin-token-creditpath-2026'
-          },
-          body: JSON.stringify(payload)
-        }
-      );
-
-      if (!response.ok) {
-        const errText = await response.text();
-        throw new Error(`Simulate failed: ${response.status} — ${errText}`);
-      }
-
-      const result = await response.json();
+      });
       console.log('Simulate result:', JSON.stringify(result));
 
-      // Map API response to SimResult array
-      const results: SimResult[] = (result.results || result.persona_results || []).map((r: Record<string, unknown>) => ({
-        persona: r.persona as string,
-        name: (r.name || r.persona_name || r.persona) as string,
-        default_tier: (r.default_tier ?? r.original_tier ?? 0) as number,
-        simulated_tier: (r.simulated_tier ?? r.sim_tier ?? 0) as number,
-        default_score: (r.default_score ?? r.original_score ?? 0) as number,
-        simulated_score: (r.simulated_score ?? r.sim_score ?? 0) as number,
-        score_delta: (r.score_delta ?? r.delta ?? 0) as number,
-        tier_changed: (r.tier_changed ?? r.changed ?? false) as boolean,
-      }));
-
-      setSimResults(results);
+      // Store raw results array - try multiple field names
+      const rawResults = result.simulation_results || result.results || result.persona_results || [];
+      setSimResults(rawResults);
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : "Unknown error";
       console.error("Simulation error:", err);

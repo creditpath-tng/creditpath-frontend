@@ -51,4 +51,21 @@ export const simulateConfig = async (payload: {
   segment_weights: object;
   tier_thresholds: object;
   recency_mode: string;
-}) => post(`${BASE_URL}/admin/simulate`, payload, ADMIN_HEADERS);
+}) => {
+  const response = await fetch(
+    'https://e37fcc4b-dc6d-4821-85bc-7940a9476e3f-00-bxzh6v4v6i34.picard.replit.dev/admin/simulate',
+    {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer admin-token-creditpath-2026'
+      },
+      body: JSON.stringify(payload)
+    }
+  );
+  if (!response.ok) {
+    const text = await response.text();
+    throw new Error(`${response.status}: ${text}`);
+  }
+  return response.json();
+};

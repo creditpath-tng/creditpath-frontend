@@ -132,7 +132,7 @@ const ScoreScreen = () => {
 
         <div className="mt-4">
           <p className="text-[13px] text-cp-text-med text-center mb-2">
-            You are <span className="font-semibold">{pointsToNext} points</span> from {TIER_CONFIG[nextTierIdx]?.emoji} {nextTierName}
+            You are <span className="font-semibold">{Math.round(pointsToNext * 10) / 10} points</span> from {TIER_CONFIG[nextTierIdx]?.emoji} {nextTierName}
           </p>
           <div className="w-full h-2 rounded-full bg-muted overflow-hidden">
             <div className="h-full rounded-full bg-cp-primary transition-all duration-[1000ms] ease-out" style={{ width: `${tierProgress}%` }} />
@@ -155,7 +155,7 @@ const ScoreScreen = () => {
                     <div key={factor.display_name}>
                       <div className="flex items-center justify-between mb-1">
                         <span className="text-[13px] text-cp-text-dark truncate mr-2">{factor.display_name}</span>
-                        <span className={`text-xs font-medium ${DIRECTION_COLORS[factor.direction]}`}>{factor.normalised_score}</span>
+                        <span className={`text-xs font-medium ${DIRECTION_COLORS[factor.direction]}`}>{Math.round(factor.normalised_score * 10) / 10}</span>
                       </div>
                       <div className="w-full h-2 rounded-full bg-muted overflow-hidden">
                         <div className={`h-full rounded-full ${DIRECTION_BAR_COLORS[factor.direction]} transition-all duration-[800ms] ease-out`} style={{ width: barsAnimated ? `${factor.normalised_score}%` : "0%", transitionDelay: `${barIndex * 60}ms` }} />

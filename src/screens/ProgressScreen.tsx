@@ -101,7 +101,7 @@ const ProgressScreen = () => {
           <span className="text-[48px] leading-none">{levelBadge.split(" ")[0]}</span>
           <div>
             <p className="text-2xl font-bold">{levelBadge.split(" ").slice(1).join(" ") || LEVELS[currentTier]?.label}</p>
-            <p className="text-[13px] text-primary-foreground/80">You are {pointsToNext} points from {nextLevelName}</p>
+            <p className="text-[13px] text-primary-foreground/80">You are {Math.round(pointsToNext * 10) / 10} points from {nextLevelName}</p>
           </div>
         </div>
 

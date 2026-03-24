@@ -107,7 +107,7 @@ const ScoreScreen = () => {
   let globalBarIndex = 0;
 
   return (
-    <div className="min-h-screen bg-cp-bg">
+    <div className="min-h-screen bg-cp-bg pb-20">
       <HeaderBar />
 
       <div className="px-4 pt-1 pb-2">

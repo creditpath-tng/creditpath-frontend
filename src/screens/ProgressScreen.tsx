@@ -234,6 +234,7 @@ const ProgressScreen = () => {
           </div>
         </div>
       )}
+      <BottomNav />
     </div>
   );
 };

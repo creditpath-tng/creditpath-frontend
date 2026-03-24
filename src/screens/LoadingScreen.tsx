@@ -1,3 +1,4 @@
+import axios from "axios";
 import { useEffect, useState } from "react";
 import { useAppContext } from "@/context/AppContext";
 import { useNavigation } from "@/hooks/useNavigation";
@@ -23,9 +24,18 @@ const LoadingScreen = () => {
   const { toast } = useToast();
   const [visibleCount, setVisibleCount] = useState(0);
   const [showReady, setShowReady] = useState(false);
+  const [apiError, setApiError] = useState<{
+    message: string;
+    status: string;
+    detail: string;
+  } | null>(null);
 
   useEffect(() => {
     const timers: ReturnType<typeof setTimeout>[] = [];
+
+    setVisibleCount(0);
+    setShowReady(false);
+    setApiError(null);
 
     MESSAGES.forEach((msg, i) => {
       timers.push(
@@ -58,19 +68,29 @@ const LoadingScreen = () => {
 
         navigateTo("score");
       } catch (err: unknown) {
-        const message = err instanceof Error ? err.message : "Unknown error";
+        const message = axios.isAxiosError(err)
+          ? err.message
+          : err instanceof Error
+            ? err.message
+            : "Unknown error";
+        const status = axios.isAxiosError(err)
+          ? String(err.response?.status ?? "Unknown")
+          : "Unknown";
+        const detailValue = axios.isAxiosError(err) ? err.response?.data?.detail : undefined;
+        const detail = typeof detailValue === "string" ? detailValue : "Unknown";
+
         console.error("API Error:", err);
         setError(`Unable to connect to scoring service: ${message}`);
+        setApiError({ message, status, detail });
         toast({
           variant: "destructive",
           description: `Connection error — ${message}`,
         });
-        navigateTo("welcome");
       }
     }, 2400));
 
     return () => timers.forEach(clearTimeout);
-  }, [navigateTo, selectedPersona]);
+  }, [navigateTo, selectedPersona, setError, setExplainData, setProgressData, setScoreData, toast]);
 
   const personaName = selectedPersona ? PERSONA_NAMES[selectedPersona] : "User";
 
@@ -79,27 +99,45 @@ const LoadingScreen = () => {
       <HeaderBar />
 
       <div className="flex-1 flex flex-col items-center justify-center px-6">
-        <div className="relative w-16 h-16">
-          <div className="absolute inset-0 rounded-full border-4 border-muted" />
-          <div className="absolute inset-0 rounded-full border-4 border-t-primary border-r-primary border-b-transparent border-l-transparent animate-spin-slow" />
-        </div>
+        {apiError ? (
+          <div className="w-full max-w-sm rounded-2xl border border-destructive/20 bg-card p-5 shadow-sm">
+            <p className="text-sm font-semibold text-destructive">API Error: {apiError.message}</p>
+            <p className="mt-2 text-sm text-destructive">Status: {apiError.status}</p>
+            <p className="mt-2 text-sm text-destructive">Detail: {apiError.detail}</p>
 
-        <div className="mt-8 space-y-3 text-center">
-          {MESSAGES.map((msg, i) => (
-            <p
-              key={i}
-              className={`text-[15px] text-cp-text-med transition-opacity duration-400
-                ${i < visibleCount ? "animate-fade-in-subtle" : "opacity-0"}`}
+            <button
+              type="button"
+              onClick={() => navigateTo("welcome")}
+              className="mt-5 h-11 w-full rounded-2xl bg-primary px-4 text-sm font-semibold text-primary-foreground transition-all duration-200 hover:brightness-110"
             >
-              {msg.text}
-            </p>
-          ))}
-        </div>
+              Try Again
+            </button>
+          </div>
+        ) : (
+          <>
+            <div className="relative w-16 h-16">
+              <div className="absolute inset-0 rounded-full border-4 border-muted" />
+              <div className="absolute inset-0 rounded-full border-4 border-t-primary border-r-primary border-b-transparent border-l-transparent animate-spin-slow" />
+            </div>
 
-        {showReady && (
-          <p className="mt-6 text-[13px] text-cp-text-light italic animate-fade-in-subtle">
-            {personaName}'s profile is ready.
-          </p>
+            <div className="mt-8 space-y-3 text-center">
+              {MESSAGES.map((msg, i) => (
+                <p
+                  key={i}
+                  className={`text-[15px] text-cp-text-med transition-opacity duration-400
+                    ${i < visibleCount ? "animate-fade-in-subtle" : "opacity-0"}`}
+                >
+                  {msg.text}
+                </p>
+              ))}
+            </div>
+
+            {showReady && (
+              <p className="mt-6 text-[13px] text-cp-text-light italic animate-fade-in-subtle">
+                {personaName}'s profile is ready.
+              </p>
+            )}
+          </>
         )}
       </div>
     </div>

@@ -45,7 +45,7 @@ const ScoreScreen = () => {
     factors: { display_name: string; normalised_score: number; direction: string; weighted_contribution: number }[];
   } | null;
 
-  const score = data?.score ?? 0;
+  const score = Math.round(data?.score ?? 0);
   const tier = data?.tier ?? 0;
   const tierLabel = data?.tier_label ?? "";
   const tierCfg = TIER_CONFIG[tier] || TIER_CONFIG[0];

@@ -8,16 +8,17 @@ import BottomNav from "@/components/BottomNav";
 const AuditScreen = () => {
   const { navigateTo } = useNavigation();
   const { toast } = useToast();
-  const { auditData, setAuditData } = useAppContext();
+  const { auditData, setAuditData, selectedPersona } = useAppContext();
   const [expandedIdx, setExpandedIdx] = useState(0);
-  const [loading, setLoading] = useState(!auditData);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (auditData) return;
     const fetchAudit = async () => {
+      setLoading(true);
+      setError(null);
       try {
-        const result = await getAuditLog();
+        const result = await getAuditLog(selectedPersona || undefined);
         setAuditData(result);
       } catch (err: unknown) {
         const msg = err instanceof Error ? err.message : "Unknown error";
@@ -29,7 +30,7 @@ const AuditScreen = () => {
       }
     };
     fetchAudit();
-  }, []);
+  }, [selectedPersona]);
 
   const entries = (auditData as { entries?: { decision_id: string; timestamp: string; score: number; tier: number; explanation_generated: boolean; admp_compliant: boolean; explanation_hash: string | null }[] } | null)?.entries || [];
 
@@ -83,8 +84,8 @@ const AuditScreen = () => {
               <div className="p-4 cursor-pointer" onClick={() => setExpandedIdx(isOpen ? -1 : i)}>
                 <div className="flex items-center justify-between">
                   <span className="text-[13px] text-cp-text-med">{formatDate(entry.timestamp)}</span>
-                  <span className={`rounded-full px-2 py-0.5 text-[11px] font-semibold ${(entry.admp_compliant || entry.explanation_generated) ? "bg-green-100 text-green-700" : "bg-muted text-cp-text-light"}`}>
-                    {(entry.admp_compliant || entry.explanation_generated) ? "ADMP ✓" : "Pending"}
+                  <span className={`rounded-full px-2 py-0.5 text-[11px] font-semibold ${entry.admp_compliant ? "bg-green-100 text-green-700" : "bg-muted text-cp-text-light"}`}>
+                    {entry.admp_compliant ? "ADMP ✓" : "Pending"}
                   </span>
                 </div>
                 <p className="text-[13px] text-cp-text-dark font-medium mt-1">Credit Tier {entry.tier} · Score: {Math.round(entry.score)}/100</p>

@@ -41,8 +41,12 @@ export const explainDecision = async (payload: {
 export const getProgress = async (persona: string) =>
   post(`${BASE_URL}/progress`, { persona }, CONSUMER_HEADERS);
 
-export const getAuditLog = async () =>
-  get(`${BASE_URL}/audit-log`, CONSUMER_HEADERS);
+export const getAuditLog = async (persona?: string) => {
+  const url = persona
+    ? `${BASE_URL}/audit-log?persona=${persona}`
+    : `${BASE_URL}/audit-log`;
+  return get(url, CONSUMER_HEADERS);
+};
 
 export const getAdminConfig = async () =>
   get(`${BASE_URL}/admin/model-config`, ADMIN_HEADERS);

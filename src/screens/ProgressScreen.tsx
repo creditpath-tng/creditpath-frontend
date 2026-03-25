@@ -65,18 +65,17 @@ const ProgressScreen = () => {
     months_active?: number; go_plus_active?: boolean; share_text?: string;
   } | null;
 
-  const currentTier = prog?.current_tier ?? 2;
-  const pointsToNext = prog?.points_to_next_level ?? 8;
-  const nextLevelName = prog?.next_level_name ?? "Achiever";
+  const currentScore = Math.round((scoreData as { score?: number } | null)?.score || 0);
+  const currentTier = (scoreData as { tier?: number } | null)?.tier ?? prog?.current_tier ?? 2;
+  const nextLevelName = prog?.next_level_name ?? LEVELS[Math.min(currentTier + 1, 4)]?.label ?? "Achiever";
+  const currentTierStart = TIER_THRESHOLDS[currentTier];
+  const nextTierStart = TIER_THRESHOLDS[Math.min(currentTier + 1, 4)];
+  const pointsToNext = Math.round(nextTierStart - currentScore);
   const streakData = prog?.streak_data ?? { bill_streak: 3, reload_streak: 4, balance_streak: 2 };
   const scoreHistory = prog?.monthly_score_history ?? [48, 52, 55, 58, 60, 62];
   const milestonesUnlocked = prog?.milestones_unlocked ?? ["first_score", "first_tier", "bill_streak_3", "climber_reached"];
   const shareText = prog?.share_text ?? `I just reached Level ${currentTier} on CreditPath! #CreditPath #TNG`;
   const levelBadge = prog?.level_badge ?? `${LEVELS[currentTier]?.emoji} ${LEVELS[currentTier]?.label}`;
-
-  const currentScore = (scoreData as { score?: number } | null)?.score ?? scoreHistory[scoreHistory.length - 1];
-  const currentTierStart = TIER_THRESHOLDS[currentTier];
-  const nextTierStart = TIER_THRESHOLDS[Math.min(currentTier + 1, 4)];
   const targetProgress = nextTierStart > currentTierStart
     ? ((currentScore - currentTierStart) / (nextTierStart - currentTierStart)) * 100
     : 100;

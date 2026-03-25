@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import BottomNav from "@/components/BottomNav";
 import { useNavigation } from "@/hooks/useNavigation";
 import { useAppContext } from "@/context/AppContext";
+import { getProgress } from "@/services/api";
 
 const LEVELS = [
   { emoji: "S", label: "Starter" },

@@ -34,11 +34,6 @@ const AuditScreen = () => {
 
   const entries = (auditData as { entries?: { decision_id: string; timestamp: string; score: number; tier: number; explanation_generated: boolean; admp_compliant: boolean; explanation_hash: string | null }[] } | null)?.entries || [];
 
-  const formatDate = (iso: string) => {
-    const d = new Date(iso);
-    return d.toLocaleString("en-MY", { dateStyle: "medium", timeStyle: "short" });
-  };
-
   return (
     <div className="min-h-screen bg-cp-bg pb-20">
       <div className="flex items-center justify-between px-5 h-14 bg-primary">
@@ -110,6 +105,7 @@ const AuditScreen = () => {
             </div>
           );
         })}
+      </div>
 
       <div className="mx-4 mt-4 flex items-center gap-3 bg-muted rounded-xl p-4">
         <div className="w-9 h-9 rounded-full bg-primary flex items-center justify-center flex-shrink-0">

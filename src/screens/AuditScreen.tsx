@@ -8,16 +8,17 @@ import BottomNav from "@/components/BottomNav";
 const AuditScreen = () => {
   const { navigateTo } = useNavigation();
   const { toast } = useToast();
-  const { auditData, setAuditData } = useAppContext();
+  const { auditData, setAuditData, selectedPersona } = useAppContext();
   const [expandedIdx, setExpandedIdx] = useState(0);
-  const [loading, setLoading] = useState(!auditData);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (auditData) return;
     const fetchAudit = async () => {
+      setLoading(true);
+      setError(null);
       try {
-        const result = await getAuditLog();
+        const result = await getAuditLog(selectedPersona || undefined);
         setAuditData(result);
       } catch (err: unknown) {
         const msg = err instanceof Error ? err.message : "Unknown error";
@@ -29,7 +30,7 @@ const AuditScreen = () => {
       }
     };
     fetchAudit();
-  }, []);
+  }, [selectedPersona]);
 
   const entries = (auditData as { entries?: { decision_id: string; timestamp: string; score: number; tier: number; explanation_generated: boolean; admp_compliant: boolean; explanation_hash: string | null }[] } | null)?.entries || [];
 

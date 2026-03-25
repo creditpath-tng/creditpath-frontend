@@ -71,6 +71,11 @@ const ProgressScreen = () => {
   const currentTierStart = TIER_THRESHOLDS[currentTier];
   const nextTierStart = TIER_THRESHOLDS[Math.min(currentTier + 1, 4)];
   const pointsToNext = Math.round(nextTierStart - currentScore);
+  const streakData = prog?.streak_data ?? { bill_streak: 3, reload_streak: 4, balance_streak: 2 };
+  const scoreHistory = prog?.monthly_score_history ?? [48, 52, 55, 58, 60, 62];
+  const milestonesUnlocked = prog?.milestones_unlocked ?? ["first_score", "first_tier", "bill_streak_3", "climber_reached"];
+  const shareText = prog?.share_text ?? `I just reached Level ${currentTier} on CreditPath! #CreditPath #TNG`;
+  const levelBadge = prog?.level_badge ?? `${LEVELS[currentTier]?.emoji} ${LEVELS[currentTier]?.label}`;
   const targetProgress = nextTierStart > currentTierStart
     ? ((currentScore - currentTierStart) / (nextTierStart - currentTierStart)) * 100
     : 100;

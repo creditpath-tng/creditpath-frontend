@@ -77,15 +77,21 @@ const AuditScreen = () => {
           <div className="bg-red-50 border border-red-200 rounded-xl p-4 text-sm text-cp-danger">{error}</div>
         )}
 
+        {!loading && !error && entries.length === 0 && (
+          <div className="text-center py-8 text-sm text-cp-text-light">No audit entries found</div>
+        )}
+
         {!loading && !error && entries.map((entry, i) => {
           const isOpen = expandedIdx === i;
           return (
             <div key={entry.decision_id} className="rounded-xl bg-cp-card shadow-sm border border-border mb-3 overflow-hidden">
               <div className="p-4 cursor-pointer" onClick={() => setExpandedIdx(isOpen ? -1 : i)}>
                 <div className="flex items-center justify-between">
-                  <span className="text-[13px] text-cp-text-med">{formatDate(entry.timestamp)}</span>
-                  <span className={`rounded-full px-2 py-0.5 text-[11px] font-semibold ${entry.admp_compliant ? "bg-green-100 text-green-700" : "bg-muted text-cp-text-light"}`}>
-                    {entry.admp_compliant ? "ADMP ✓" : "Pending"}
+                  <span className="text-[13px] text-cp-text-med">
+                    {new Date(entry.timestamp).toLocaleDateString('en-MY', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })}
+                  </span>
+                  <span className={`rounded-full px-2 py-0.5 text-xs font-semibold ${entry.admp_compliant === true ? "bg-green-100 text-green-700" : "bg-gray-100 text-gray-500"}`}>
+                    {entry.admp_compliant === true ? "ADMP ✓" : "Pending"}
                   </span>
                 </div>
                 <p className="text-[13px] text-cp-text-dark font-medium mt-1">Credit Tier {entry.tier} · Score: {Math.round(entry.score)}/100</p>
@@ -93,16 +99,17 @@ const AuditScreen = () => {
               </div>
               <div className={`overflow-hidden transition-all duration-300 ${isOpen ? "max-h-48" : "max-h-0"}`}>
                 <div className="px-4 pb-4 bg-muted/50 border-t border-border pt-3 space-y-1">
-                  <p className="text-[11px] text-cp-text-light font-mono truncate">ID: {entry.decision_id}</p>
-                  <p className="text-[11px] text-cp-text-light font-mono truncate">Hash: {entry.explanation_hash || "Not generated"}</p>
-                  <p className="text-xs text-cp-text-med">Explanation generated: {entry.explanation_generated ? "Yes" : "No"}</p>
-                  <p className="text-xs text-cp-text-med">Factors reviewed: 12</p>
+                  <p className="text-[11px] text-gray-400 font-mono truncate">Decision ID: {(entry.decision_id || '').slice(0, 36)}</p>
+                  <p className="text-[11px] text-gray-400 font-mono truncate">Hash: {entry.explanation_hash || "Not generated"}</p>
+                  <p className={`text-xs ${entry.explanation_generated ? "text-green-600" : "text-amber-600"}`}>
+                    Explanation generated: {entry.explanation_generated ? "Yes ✓" : "No — explanation not yet requested"}
+                  </p>
+                  <p className="text-xs text-gray-500">Factors reviewed: 12</p>
                 </div>
               </div>
             </div>
           );
         })}
-      </div>
 
       <div className="mx-4 mt-4 flex items-center gap-3 bg-muted rounded-xl p-4">
         <div className="w-9 h-9 rounded-full bg-primary flex items-center justify-center flex-shrink-0">

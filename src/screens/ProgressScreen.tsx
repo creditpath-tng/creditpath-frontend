@@ -73,6 +73,12 @@ const ProgressScreen = () => {
   const pointsToNext = Math.round(nextTierStart - currentScore);
   const streakData = prog?.streak_data ?? { bill_streak: 3, reload_streak: 4, balance_streak: 2 };
   const scoreHistory = prog?.monthly_score_history ?? [48, 52, 55, 58, 60, 62];
+  const scoreDiff = (scoreHistory[scoreHistory.length - 1] || 0) - (scoreHistory[0] || 0);
+  const trendLabel = scoreDiff > 2
+    ? { text: '↑ Improving', color: 'hsl(var(--cp-success))' }
+    : scoreDiff < -2
+    ? { text: '↓ Declining', color: 'hsl(var(--cp-danger))' }
+    : { text: '→ Stable', color: 'hsl(var(--cp-warning))' };
   const milestonesUnlocked = prog?.milestones_unlocked ?? ["first_score", "first_tier", "bill_streak_3", "climber_reached"];
   const shareText = prog?.share_text ?? `I just reached Level ${currentTier} on CreditPath! #CreditPath #TNG`;
   const levelBadge = prog?.level_badge ?? `${LEVELS[currentTier]?.emoji} ${LEVELS[currentTier]?.label}`;
@@ -161,7 +167,7 @@ const ProgressScreen = () => {
       <div className="mx-4 mt-3 rounded-2xl bg-cp-card shadow-sm p-5">
         <div className="flex items-center justify-between">
           <h2 className="text-sm font-semibold text-cp-text-dark">Score History</h2>
-          <span className="text-xs font-bold text-cp-success">↑ Improving</span>
+          <span className="text-xs font-bold" style={{ color: trendLabel.color }}>{trendLabel.text}</span>
         </div>
         <div className="mt-3 w-full overflow-hidden">
           <svg viewBox={`-10 -20 ${CHART_W + 20} ${CHART_H + 30}`} className="w-full" preserveAspectRatio="xMidYMid meet">

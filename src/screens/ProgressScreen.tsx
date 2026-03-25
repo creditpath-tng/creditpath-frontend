@@ -42,10 +42,21 @@ const TIER_THRESHOLDS = [0, 40, 55, 70, 85];
 
 const ProgressScreen = () => {
   const { navigateTo } = useNavigation();
-  const { progressData, scoreData } = useAppContext();
+  const { progressData, setProgressData, scoreData, selectedPersona } = useAppContext();
   const [tierProgress, setTierProgress] = useState(0);
   const [showShareModal, setShowShareModal] = useState(false);
   const [copied, setCopied] = useState(false);
+
+  useEffect(() => {
+    if (selectedPersona) {
+      console.log('Fetching progress for persona:', selectedPersona);
+      getProgress(selectedPersona).then((data) => {
+        setProgressData(data);
+      }).catch((err) => {
+        console.error('Failed to fetch progress:', err);
+      });
+    }
+  }, [selectedPersona]);
 
   const prog = progressData as {
     level_badge?: string; current_tier?: number; points_to_next_level?: number;

@@ -167,7 +167,7 @@ const ProgressScreen = () => {
       <div className="mx-4 mt-3 rounded-2xl bg-cp-card shadow-sm p-5">
         <div className="flex items-center justify-between">
           <h2 className="text-sm font-semibold text-cp-text-dark">Score History</h2>
-          <span className="text-xs font-bold text-cp-success">↑ Improving</span>
+          <span className="text-xs font-bold" style={{ color: trendLabel.color }}>{trendLabel.text}</span>
         </div>
         <div className="mt-3 w-full overflow-hidden">
           <svg viewBox={`-10 -20 ${CHART_W + 20} ${CHART_H + 30}`} className="w-full" preserveAspectRatio="xMidYMid meet">
